@@ -39,41 +39,42 @@ def apply_coding_rate(bit_stream, coding_rate):
     return coded_bit_stream
 
 
-# FIXME: Pass in two bits (QPSK modulation) and calculate signal value
-#       ** See slide 10 in lecture 4 **
-def calculate_signal_value(t, bit):
-    """Calculates value of carier signal at time `t` given `bit`."""
-    return (
-        0
-        if bit == 0
-        else AMPLITUDE * np.sin(2 * np.pi * CARRIER_FREQUENCY * t + PHASE_SHIFT)
-    )
+def calculate_signal_value(t, bits):
+    """Calculates value of carier signal at time `t` given `bits`.
+    Applies QPSK modulation to `bits`."""
+    if bits == [1, 1]:
+        return AMPLITUDE * np.cos(2 * np.pi * CARRIER_FREQUENCY * t + (np.pi / 4))
+    elif bits == [0, 1]:
+        return AMPLITUDE * np.cos(2 * np.pi * CARRIER_FREQUENCY * t + (3 * np.pi / 4))
+    elif bits == [0, 0]:
+        return AMPLITUDE * np.cos(2 * np.pi * CARRIER_FREQUENCY * t - (3 * np.pi / 4))
+    else:
+        return AMPLITUDE * np.cos(2 * np.pi * CARRIER_FREQUENCY * t - (np.pi / 4))
 
 
 def rf_up_conversion(bit_stream, step=0.001):
     """Converts bit stream to RF signal."""
     rf_up_conversion = []
     stream_length = len(bit_stream)
+    symbol_count = stream_length // 2  # two bits for one symbol (QPSK modulation)
     time_series = [
-        round(i * step, 3) for i in range(stream_length * int(SYMBOL_DURATION / step))
+        round(i * step, 3) for i in range(symbol_count * int(SYMBOL_DURATION / step))
     ]
-    # FIXME: pass in two bits to calculate_signal_value for QPSK modulation
-    for b in range(stream_length):
-        t = b * int(SYMBOL_DURATION / step)
-        while t < len(time_series) and time_series[t] < (b + 1):
-            rf_up_conversion.append(
-                calculate_signal_value(time_series[t], bit_stream[b])
-            )
+    bs = 0
+    for b in range(0, stream_length, 2):
+        t = bs * int(SYMBOL_DURATION / step)
+        bits = bit_stream[b : b + 2]
+        while t < len(time_series) and time_series[t] < (bs + 1):
+            rf_up_conversion.append(calculate_signal_value(time_series[t], bits))
             t += 1
+        bs += 1
     return rf_up_conversion, time_series
 
 
-print(apply_coding_rate(BIT_STREAM, CODING_RATE))
+signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
 
-# signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
-
-# plt.plot(time, signal)
-# plt.xlabel("Time (s)")
-# plt.ylabel("Signal")
-# plt.title("Signal vs. Time")
-# plt.show()
+plt.plot(time, signal)
+plt.xlabel("Time (s)")
+plt.ylabel("Signal")
+plt.title("Signal vs. Time")
+plt.show()
