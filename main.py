@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 ########################################################################################
 # Assume a source (transmitter) sends a bit-stream 1 0 1.
@@ -52,4 +53,8 @@ def rf_up_conversion(bit_stream, step=0.001):
 
 signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
 
-print(f"Signal cardinality: {len(signal)}\nTime cardinality: {len(time)}")
+plt.plot(time, signal)
+plt.xlabel("Time (s)")
+plt.ylabel("Signal")
+plt.title("Signal vs. Time")
+plt.show()
