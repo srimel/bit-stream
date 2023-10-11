@@ -21,12 +21,14 @@ SYMBOL_DURATION = 1
 PHASE_SHIFT = 0
 
 
-# TODO: Not sure if this is the correct way to apply the coding rate
-#       Doesn't work for other rates...
+# FIXME: Coding rate of n/m means every n bit is represented by m bits
+#       ** See slide 9 in lecture 4 **
 def apply_coding_rate(bit_stream, coding_rate):
     return np.repeat(bit_stream, int(1 / coding_rate))
 
 
+# FIXME: Pass in two bits (QPSK modulation) and calculate signal value
+#       ** See slide 10 in lecture 4 **
 def calculate_signal_value(t, bit):
     """Calculates value of carier signal at time `t` given `bit`."""
     return (
@@ -43,11 +45,10 @@ def rf_up_conversion(bit_stream, step=0.001):
     time_series = [
         round(i * step, 3) for i in range(stream_length * int(SYMBOL_DURATION / step))
     ]
-    i = 0
+    # FIXME: pass in two bits to calculate_signal_value for QPSK modulation
     for b in range(stream_length):
         t = b * int(SYMBOL_DURATION / step)
         while t < len(time_series) and time_series[t] < (b + 1):
-            i += 1
             rf_up_conversion.append(
                 calculate_signal_value(time_series[t], bit_stream[b])
             )
