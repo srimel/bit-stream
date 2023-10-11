@@ -19,7 +19,6 @@ CODING_RATE = 1 / 2
 CARRIER_FREQUENCY = 2
 AMPLITUDE = 2
 SYMBOL_DURATION = 1
-PHASE_SHIFT = 0
 
 
 def apply_coding_rate(bit_stream, coding_rate):
