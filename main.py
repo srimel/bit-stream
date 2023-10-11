@@ -4,6 +4,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from fractions import Fraction
 
 ########################################################################################
 # Assume a source (transmitter) sends a bit-stream 1 0 1.
@@ -21,10 +22,21 @@ SYMBOL_DURATION = 1
 PHASE_SHIFT = 0
 
 
-# FIXME: Coding rate of n/m means every n bit is represented by m bits
-#       ** See slide 9 in lecture 4 **
 def apply_coding_rate(bit_stream, coding_rate):
-    return np.repeat(bit_stream, int(1 / coding_rate))
+    """Applies coding rate to bit stream."""
+    coded_bit_stream = []
+    frac = Fraction(coding_rate).limit_denominator()
+    n = frac.numerator
+    m = frac.denominator
+    i = 1
+    for bit in bit_stream:
+        if i % n == 0:  # repeat symbol
+            for j in range(m):
+                coded_bit_stream.append(bit)
+        else:
+            coded_bit_stream.append(bit)
+        i += 1
+    return coded_bit_stream
 
 
 # FIXME: Pass in two bits (QPSK modulation) and calculate signal value
@@ -56,10 +68,12 @@ def rf_up_conversion(bit_stream, step=0.001):
     return rf_up_conversion, time_series
 
 
-signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
+print(apply_coding_rate(BIT_STREAM, CODING_RATE))
 
-plt.plot(time, signal)
-plt.xlabel("Time (s)")
-plt.ylabel("Signal")
-plt.title("Signal vs. Time")
-plt.show()
+# signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
+
+# plt.plot(time, signal)
+# plt.xlabel("Time (s)")
+# plt.ylabel("Signal")
+# plt.title("Signal vs. Time")
+# plt.show()
