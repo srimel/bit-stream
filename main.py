@@ -50,4 +50,6 @@ def rf_up_conversion(bit_stream, step=0.001):
     return rf_up_conversion, time_series
 
 
-print(rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE)))
+signal, time = rf_up_conversion(apply_coding_rate(BIT_STREAM, CODING_RATE))
+
+print(f"Signal cardinality: {len(signal)}\nTime cardinality: {len(time)}")
